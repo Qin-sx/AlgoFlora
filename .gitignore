@@ -1,3 +1,17 @@
+# CMake build directories
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+
+# Build directories
+/build/
+/out/
+/bin/
+/lib/
+/Debug/
+/Release/
+
 # Prerequisites
 *.d
 
