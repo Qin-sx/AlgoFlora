@@ -106,6 +106,41 @@ public:
     }
 };
 
+class Solution_216 {
+    vector<vector<int>> ans;
+    vector<int> path;
+
+    void backtrack(int sum, int iStart, int k, int n)
+    {
+        if (sum == n && path.size() == k)
+        {
+            ans.push_back(path);
+            return;
+        }
+        else if (sum > n || path.size() > k)
+        {
+            return;
+        }
+
+        for (int i = iStart; i < 9 + 1 && 9 + 1 - i >= k - path.size(); ++i)
+        {
+            sum += i;
+            path.push_back(i);
+            backtrack(sum, i + 1, k, n);
+            sum -= i;
+            path.pop_back();
+        }
+    }
+
+public:
+    vector<vector<int>> combinationSum3(int k, int n) {
+        int sum = 0;
+        int iStart = 1;
+        backtrack(sum, iStart, k, n);
+        return ans;
+    }
+};
+
 int main()
 {
     Solution_77 s77;
@@ -142,6 +177,20 @@ int main()
     vector<vector<int>> ans1 = s40.combinationSum2(candidates1, 8);
     cout << "[";
     for (auto &v : ans1)
+    {
+        cout << "[";
+        for (auto &i : v)
+        {
+            cout << i << " ";
+        }
+        cout <<"]";
+    }
+    cout <<"]"<< endl;
+
+    Solution_216 s216;
+    vector<vector<int>> ans2 = s216.combinationSum3(3, 9);
+    cout << "[";
+    for (auto &v : ans2)
     {
         cout << "[";
         for (auto &i : v)
