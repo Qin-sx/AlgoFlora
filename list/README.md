@@ -77,3 +77,49 @@ public:
     }
 };
 ```
+
+### leetcode 138
+通过hashmap建立索引，使得new list可以轻而易举地复制old list。
+```c++
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+*/
+
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        std::unordered_map<Node*, Node*> hash;
+        Node* cur = head;
+
+        while (cur)
+        {
+            hash[cur] = new Node(cur->val);
+            cur = cur->next;
+        }
+
+        cur = head;
+
+        while (cur)
+        {
+            Node* copy = hash[cur];
+            copy->next = hash[cur->next];
+            copy->random = hash[cur->random];
+            cur = cur->next;
+        }
+
+        return hash[head];
+    }
+};
+```
