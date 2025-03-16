@@ -145,3 +145,47 @@ public:
     }
 };
 ```
+
+### leetcode 23
+利用小根堆(min heap)，存入了k个链表节点进行比较。每次pop最小值，如果pop的节点有next节点，则push这个next节点。
+自定义了小根堆的比较器。
+```c++
+class Solution {
+    struct compare{
+        bool operator()(ListNode* a, ListNode* b)
+        {
+            return a->val > b->val;
+        }
+    };
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        int k = lists.size();
+
+        priority_queue<ListNode*, vector<ListNode*>, compare> smallHeap;
+
+        for(int i = 0; i < k; ++i)
+        {
+            if(lists[i])
+                smallHeap.push(lists[i]);
+        }
+
+        ListNode* dummy = new ListNode(0);
+        ListNode* cur = dummy;
+
+        while(!smallHeap.empty())
+        {
+            ListNode* tmp = smallHeap.top();
+
+            cur->next = tmp;
+            cur = cur->next;
+
+            smallHeap.pop();
+
+            if (tmp->next)
+                smallHeap.push(tmp->next);
+
+        }
+        return dummy->next;
+    }
+};
+```
