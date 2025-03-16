@@ -41,39 +41,61 @@ public:
     }
 };
 ```
-### leetcode 2
+### leetcode 445 (leetcode 2进阶版)
+用于熟悉反转过程
 用于熟悉加法过程
 并且每次循环要进行0和空指针的判断
 ```c++
 class Solution {
+
+    ListNode* reverse(ListNode* head)
+    {
+        ListNode* prev = nullptr;
+
+        while(head)
+        {
+            ListNode* after = head->next;
+            head->next = prev;
+            prev = head;
+            head = after;
+        }
+        return prev;
+    }
+
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
-        ListNode* dummy = new ListNode(0); // 保留的头指针
-        ListNode* cur = dummy; // 当前指针，进行移动
 
+        l1 = reverse(l1);
+        l2 = reverse(l2);
+
+        ListNode* dummy = new ListNode(0);
+        ListNode* cur = dummy;
 
         int carry = 0;
-
-        while (l1 || l2 || carry !=0)
+        while((l1) || (l2) || carry)
         {
             int digit1 = (l1) ? l1->val : 0;
             int digit2 = (l2) ? l2->val : 0;
 
             int sum = digit1 + digit2 + carry;
+
             int digit = sum % 10;
             carry = sum / 10;
 
-            ListNode* n = new ListNode(digit);
-            cur->next = n;
+            ListNode* newNode = new ListNode(digit);
+
+            cur->next = newNode;
             cur = cur->next;
 
             l1 = (l1) ? l1->next : nullptr;
             l2 = (l2) ? l2->next : nullptr;
         }
 
-        ListNode* result = dummy->next;
+        auto ans = dummy->next;
         delete dummy;
-        return result;
+
+        ans = reverse(ans);
+        return ans;
     }
 };
 ```
