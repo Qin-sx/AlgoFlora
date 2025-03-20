@@ -248,3 +248,106 @@ public:
     }
 };
 ```
+
+正确版本  
+其实只有四种情况：
+1. 小堆加入`nums[i]`，小堆删除`nums[i-k]`
+2. 小堆加入`nums[i]`，大堆删除`nums[i-k]`
+3. 大堆加入`nums[i]`，大堆删除`nums[i-k]`
+4. 大堆加入`nums[i]`，大堆删除`nums[i-k]`
+所以`balance`只有-2，0，2。
+每次要先删除再加入。
+
+```c++
+class Solution {
+    priority_queue<int> small;
+    priority_queue<int, vector<int>, greater<int>> big;
+    unordered_map<int, int> hash;
+
+    double cal_ans(int k)
+    {
+        if(k & 1)
+        {
+            return small.top();
+        }
+        else
+        {
+            return ((double)(small.top() + (double)big.top())*0.5);
+        }
+    }
+public:
+    vector<double> medianSlidingWindow(vector<int>& nums, int k) {
+        vector<double> ans;
+        ans.reserve(nums.size() - k + 1);
+        for (int i = 0; i < k; ++i)
+        {
+            small.push(nums[i]);
+        }
+
+        for (int i = 0; i < k/ 2; ++i)
+        {
+            big.push(small.top());
+            small.pop();
+        }
+
+        ans.push_back(cal_ans(k));
+
+        for (int i = k; i < nums.size(); ++i)
+        {
+            int balance = 0;
+
+            // 第一步：先看需要删除的元素在哪个堆中
+            hash[nums[i-k]]++;
+
+            if (!small.empty() && nums[i-k] <= small.top())
+            {
+                balance++;
+            }
+            else
+            {
+                balance--;
+            }
+
+            // 第二步：看加入的元素应该放在哪个堆中
+            if (!small.empty() && nums[i] <= small.top())
+            {
+                small.push(nums[i]);
+                balance--;
+            }
+            else
+            {
+                big.push(nums[i]);
+                balance++;
+            }
+
+            // 第三步：调整
+            if(balance < 0)
+            {
+                big.push(small.top());
+                small.pop();
+            }
+            else if (balance > 0)
+            {
+                small.push(big.top());
+                big.pop();
+            }
+
+            // 第四步：删除需要删除的元素，注意每次top的时候要先判断empty
+            // 为什么要先删除数字较小的堆？
+            while(!small.empty() && hash[small.top()])
+            {
+                hash[small.top()]--;
+                small.pop();
+            }
+            while(!big.empty() && hash[big.top()])
+            {
+                hash[big.top()]--;
+                big.pop();
+            }
+
+            ans.push_back(cal_ans(k));
+        }
+        return ans;
+    }
+};
+```
