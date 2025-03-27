@@ -129,3 +129,65 @@ public:
     }
 };
 ```
+
+### leetcode 131
+
+```c++
+
+class Solution {
+    vector<vector<string>> ans;
+
+    bool isPalin(string s, int l, int r)
+    { 
+        while(l <= r)
+        {
+            if (s[l] != s[r])
+            {
+                return false;
+            }
+            ++l;
+            --r;
+        }
+        return true;
+    }
+
+    void backtrace(int iBegin, string& s, vector<string> path)
+    {
+        // 终止条件
+        if (iBegin >= s.size())
+        {
+            ans.push_back(path);
+            return;
+        }
+
+        // 多叉树遍历
+        for (int i = iBegin; i < s.size(); ++i)
+        {
+            // 做选择
+            string sub = s.substr(iBegin, i - iBegin + 1);
+            if(isPalin(sub, 0, sub.size() - 1))
+            {
+                path.push_back(sub);
+            }
+            else
+            {
+                // 不是回文串，直接测试加上下一个字符是不是回文串
+                continue;
+            }
+
+            backtrace(i+1, s, path);
+
+            // 撤销选择
+            path.pop_back();
+        }
+    }
+
+public:
+    vector<vector<string>> partition(string s) {
+        vector<string> path;
+        backtrace(0, s, path);
+        return ans;
+    }
+};
+
+```
