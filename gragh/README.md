@@ -137,5 +137,145 @@ public:
 };
 ```
 
+### leetcode 210 课程表2
 
+#### BFS 排序
 
+只需要在`环检查`的基础上面修改一下即可。  
+主要两道题题目先后课程顺序不一样。  
+
+```c++
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<int> ans;
+
+        // 建图
+        vector<vector<int>> edges(numCourses);
+        vector<int> indegree(numCourses, 0);
+
+        for (auto pre : prerequisites)
+        {
+            edges[pre[1]].push_back(pre[0]);  //学了课程0之后可以学课程1
+            ++indegree[pre[0]];               //课程1的入度+1
+        }
+
+        // 初始化队列
+        queue<int> que;
+        for (int i = 0; i < numCourses; ++i)
+        {
+            if (indegree[i] == 0)
+            {
+                que.push(i);
+            }
+
+        }
+
+        // BFS 多叉树层级遍历
+
+        while(!que.empty())
+        {
+            auto cur = que.front();
+            que.pop();
+
+            ans.push_back(cur); // 遍历了几个节点
+
+            for (auto node : edges[cur])
+            {
+                --indegree[node]; // 入度 -1
+                if(indegree[node] == 0) // 如果入度为0，将节点放入队列（每次都会-1，所以只会入队一次）
+                {
+                    que.push(node);
+                }
+            }
+        }
+        if(ans.size() != numCourses)
+        {
+            return vector<int>{};
+        }
+
+        return ans; //是否遍历了所有的节点
+    }
+};
+```
+
+#### DFS 排序
+
+简单修改DFS环检测即可。但是注意只能后续遍历。因为前序遍历需要撤销选择，但是实际不能撤销选择。前序遍历没有后面的信息。  
+
+```c++
+    // 0
+    // | \
+    // 1  2
+    //
+class Solution {
+    vector<bool> visit;
+    vector<bool> path;
+    vector<int> order;
+    bool iscycle;
+
+    void traverse(const vector<vector<int>>& edges, int node, int numCourses)
+    {
+        if (iscycle)
+        {
+            return;
+        }
+
+        if (path[node])
+        {
+            iscycle = true;
+            return;
+        }
+
+        if (visit[node])
+        {
+            return;
+        }
+
+        // 加入节点
+        visit[node] = true;
+        path[node] = true;
+
+        // 多叉树遍历
+        for (auto e : edges[node])
+        {
+            traverse(edges, e, numCourses);
+        }
+
+        // 撤销节点
+        path[node] = false;
+        order.push_back(node);
+    }
+
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+      
+        // 建图
+        vector<vector<int>> edges(numCourses);
+
+        for (auto pre : prerequisites)
+        {
+            edges[pre[1]].push_back(pre[0]);  //学了课程0之后可以学课程1
+        }
+
+        // 初始化
+        visit = vector<bool>(numCourses,false);
+        path = vector<bool>(numCourses,false);
+        iscycle = false;
+        
+        // DFS 多叉树遍历
+
+        for (int i = 0; i < numCourses; ++i) //有可能有多个图，所以每个节点都需要遍历一次。有visit记录。
+        {
+            traverse(edges, i, numCourses);
+        }
+        
+        if(iscycle)
+        {
+            return vector<int>{};
+        }
+        reverse(order.begin(), order.end());
+        return order; //是否遍历了所有的节点
+    }
+};
+```
